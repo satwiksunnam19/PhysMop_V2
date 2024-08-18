@@ -111,7 +111,3 @@ If you have questions or encounter any issues when running the code, feel free t
 
 ## References
 Part of our code is developed based on [siMLPe](https://github.com/dulucas/siMLPe). The SMPL model data is downloaded from [SMPL-X model](https://github.com/vchoutas/smplx). We thank them for generously sharing their outstanding work.
-
---- 
-
-Feel free to adjust the content to match your specific modifications and requirements! 
