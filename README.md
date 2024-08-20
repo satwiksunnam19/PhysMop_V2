@@ -66,17 +66,17 @@ PhysMoP is trained in three steps:
 
 #### 1. Train the data-driven model
 ```
-python train_script.py --name data --data True --num_epochs 5 --keypoint_loss_weight_data 1 --pose_loss_weight_data 2
+python train_script.py --name data --data True --num_epochs 5 --keypoint_loss_weight_data 1 --pose_loss_weight_data 2 --momentum_loss_weight 1 --energy_loss_weight 1
 ```
 
 #### 2. Train the physics-based model with the checkpoint (DATA_CHECKPOINT) obtained from step 1.
 ```
-python train_script.py --name data_physics --data True --physics True --pretrained_checkpoint DATA_CHECKPOINT --keypoint_loss_weight_physics_gt 1 --pose_loss_weight_physics_gt 2 --num_epochs 2 --keypoint_loss_weight_data 1 --pose_loss_weight_data 2 --resume
+python train_script.py --name data_physics --data True --physics True --pretrained_checkpoint DATA_CHECKPOINT --keypoint_loss_weight_physics_gt 1 --pose_loss_weight_physics_gt 2 --num_epochs 2 --keypoint_loss_weight_data 1 --pose_loss_weight_data 2 --momentum_loss_weight 1 --energy_loss_weight 1 --resume 
 ```
 
 #### 3. Fix the data-driven and physics-based models and train the fusion model with the checkpoint (PHYSICS_CHECKPOINT) obtained from step 2.
 ```
-python train_script.py --name data_physics_fusion --data True --physics True --fix_weight True --fusion True --pretrained_checkpoint PHYSICS_CHECKPOINT --keypoint_loss_weight_physics_gt 1 --pose_loss_weight_physics_gt 2 --num_epochs 2 --keypoint_loss_weight_data 1 --pose_loss_weight_data 2 --keypoint_loss_weight_fusion 1 --pose_loss_weight_fusion 2
+python train_script.py --name data_physics_fusion --data True --physics True --fix_weight True --fusion True --pretrained_checkpoint PHYSICS_CHECKPOINT --keypoint_loss_weight_physics_gt 1 --pose_loss_weight_physics_gt 2 --num_epochs 2 --keypoint_loss_weight_data 1 --pose_loss_weight_data 2 --keypoint_loss_weight_fusion 1 --pose_loss_weight_fusion 2 --momentum_loss_weight 1 --energy_loss_weight 1 
 ```
 The saved model checkpoint can be found at './logs'.
 
