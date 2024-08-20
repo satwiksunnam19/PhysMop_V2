@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-from siMLPe_mlp import build_mlps
+from siMLPe_mlp import build_mlps 
 from einops.layers.torch import Rearrange 
 
 from utils.utils import remove_singlular_batch, smoothness_constraint
@@ -148,7 +148,7 @@ class Regression(nn.Module):
         k1 = dt * (pred_M_inv @ (pred_jactuation - pred_C).unsqueeze(2)).squeeze(2)
         k2 = dt * (pred_M_inv @ (pred_jactuation - pred_C).unsqueeze(2)).squeeze(2) + 0.5 * k1
         k3 = dt * (pred_M_inv @ (pred_jactuation - pred_C).unsqueeze(2)).squeeze(2) + 0.5 * k2
-        k4 = dt * (pred_M_inv @ (pred_jactuation - pred_C).unsqueeze(2)).squeeze(2) + k3
+        k4 = dt * (pred_M_inv @ (pred_jactuation - pred_C).unsqueeze(2)).squeeze(2) + k3 
 
         pred_q_ddot = (k1 + 2*k2 + 2*k3 + k4) / 6.0
 
@@ -196,9 +196,10 @@ class Regression(nn.Module):
                 # Physics Pred history
                 if mode=='train' and not fusion:
                     pred_q_ddot_physics_pred, pred_jactuation, pred_C = pred_q_ddot_physics_gt,pred_jactuation,pred_C
-                    motion_pred_physics_pred = motion_pred_physics_gt
+                    motion_pred_physics_pred = motion_pred_physics_gt 
                 else:
-                    pred_q_ddot_physics_pred, pred_jactuation, pred_C= self.physics_forward(motion_feats_all.clone(), motion_pred_physics_pred[:, t:t+3], B, D)
+                    pred_q_ddot_physics_pred[:,t+1], pred_jactuation, pred_C= self.physics_forward(motion_feats_all.clone(), motion_pred_physics_pred[:, t:t+3], B, D)
+
                     motion_pred_physics_pred[:, t+3] = 2*motion_pred_physics_pred[:, t+2] - motion_pred_physics_pred[:, t+1] + pred_q_ddot_physics_pred[:, t+1].clone() * constants.dt**2
         # Fusion
         if fusion:
@@ -214,7 +215,7 @@ class Regression(nn.Module):
             weight_t = torch.FloatTensor(1).fill_(0.).to(motion_input.device)
 
         return (motion_pred_data, motion_pred_physics_gt, motion_pred_physics_pred, motion_pred_fusion, 
-                pred_q_ddot_physics_gt, weight_t,pred_jactuation,pred_C,pred_jactuation_fusion,pred_C_fusion)
+                pred_q_ddot_physics_gt, weight_t,pred_jactuation,pred_C) 
 
 class PhysMoP(nn.Module):
     def __init__(
@@ -226,15 +227,16 @@ class PhysMoP(nn.Module):
     ):
         super(PhysMoP,self).__init__()
         self.device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.hist_length=hist_length
         self.fusion=fusion
 
         self.regressor=Regression(physics,data)
     
     def forward_dynamics(self,gt_mesh,gt_q,gt_q_ddot,gt_M_inv,gt_JcT,device,mode='Train'):
         gt_q=gt_q.reshape([-1,config.total_length,63])
-        motion_pred_data, motion_pred_physics_gt, motion_pred_physics_pred, motion_pred_fusion, pred_q_ddot_physics_gt, weight_t, pred_jactuation,pred_C,pred_jactuation_fusion,pred_C_fusion=self.regressor(gt_q[:,:self.hist_length],gt_q,mode,self.fusion)
+        motion_pred_data, motion_pred_physics_gt, motion_pred_physics_pred, motion_pred_fusion, pred_q_ddot_physics_gt, weight_t, pred_jactuation,pred_C,_,_=self.regressor(gt_q[:,:self.hist_length],gt_q,mode,self.fusion)
         _,pred_q_ddot_data,_=smoothness_constraint(motion_pred_data.clone(),constants.dt)
         return (
             motion_pred_data, motion_pred_physics_gt, motion_pred_physics_pred, motion_pred_fusion, pred_q_ddot_data, pred_q_ddot_physics_gt, weight_t, 
-            pred_jactuation,pred_C,pred_jactuation_fusion,pred_C_fusion
+            pred_jactuation,pred_C
         )
