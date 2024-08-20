@@ -28,7 +28,7 @@ device = torch.device('cpu')
 from utils.utils import batch_rodrigues, rotmat2eulerzyx, rotmat2euleryzx, rotmat2eulerzxy
 from scipy.ndimage import gaussian_filter1d, median_filter
 
-# %%
+
 def read_data(trunk_datafolder, trunk_path, folder, sequences, seqlen, overlap=0.75, fps=30):
 
     for seq_name in sequences:
@@ -121,7 +121,6 @@ def read_sequence(trunk_datafolder, trunk_path, folder, seq_name, fps, seqlen, o
     return
 
 
-# %%
 import pickle
 
 amass_dir = './dataset/data_raw/AMASS'
@@ -146,5 +145,4 @@ for split in ['test', 'train']:
     data_file = osp.join(save_dir, f'amass_{split}_%d.pkl' % seqlen)
     
     print(f'Saving AMASS dataset to {data_file} with total number of data %d' % len(data))
-    pickle.dump(data, open(data_file, 'wb'))
-
+    pickle.dump(data, open(data_file, 'wb'))  
