@@ -12,7 +12,7 @@ from models.PhysMop import PhysMoP
 from models.humanmodel import SMPL, SMPLH
 
 from utils.utils import smoothness_constraint, batch_roteulerSMPL, remove_singlular_batch, keypoint_3d_loss
-from utils.utils import compute_errors, compute_momentum, compute_kinetic_energy
+from utils.utils import compute_errors
 
 from train.base_trainer import BaseTrainer
 
@@ -92,7 +92,8 @@ class Trainer(BaseTrainer):
     
     def compute_momentum_energy_loss_v2(self, pred_jactuation, pred_q_ddot, pred_C):
         """Compute losses for energy and momentum conservation using joint actuation and dynamics."""
-
+        pred_jactuation=pred_jactuation.unsqueeze(1)
+        pred_C=pred_C.unsqueeze(1) 
         # Compute predicted kinetic energy
         pred_energy = 0.5 * (torch.sum(pred_jactuation * pred_q_ddot, dim=1) - torch.sum(pred_C * pred_q_ddot, dim=1))
         
@@ -103,7 +104,7 @@ class Trainer(BaseTrainer):
         energy_loss = torch.mean(torch.abs(pred_energy))  # Ideally, pred_energy should be close to a desired value (e.g., ground truth)
         momentum_loss = torch.mean(torch.abs(pred_momentum))  # Similarly, pred_momentum should be conserved (close to 0)
 
-        return momentum_loss, energy_loss 
+        return momentum_loss, energy_loss  
 
     def train_step(self, input_batch):
         self.model.train()
@@ -127,7 +128,7 @@ class Trainer(BaseTrainer):
         gt_vertices_norm, gt_M_inv, gt_JcT = None, None, None
 
         model_output = self.model.forward_dynamics(gt_vertices_norm, gt_q, gt_q_ddot, gt_M_inv, gt_JcT, self.device)
-        pred_q_data, pred_q_physics_gt, pred_q_physics_pred, pred_q_fusion, pred_q_ddot_data, pred_q_ddot_physics_gt, weight_t, pred_jacutation, pred_c, pred_jacutation_fusion, pred_c_fusion = model_output 
+        pred_q_data, pred_q_physics_gt, pred_q_physics_pred, pred_q_fusion, pred_q_ddot_data, pred_q_ddot_physics_gt, weight_t, pred_jacutation, pred_c = model_output 
 
         # Compute momentum and energy loss
         momentum_loss,energy_loss=self.compute_momentum_energy_loss_v2(pred_jacutation,pred_q_ddot_physics_gt,pred_c)
@@ -232,4 +233,4 @@ class Trainer(BaseTrainer):
             self.summary_writer.add_scalar(loss_name, val, self.step_count)
 
     def test(self):
-        pass
+        pass 
