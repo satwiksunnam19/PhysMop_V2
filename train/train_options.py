@@ -53,7 +53,8 @@ class TrainOptions():
         train.add_argument('--keypoint_loss_weight_fusion', default=0., type=float, help='Weight of 3D keypoint loss for training the fusion model')
         train.add_argument('--pose_loss_weight_fusion', default=0., type=float, help='Weight of joint angle loss for training the fusion model')
         train.add_argument('--fusion_weight_reg_loss_weight', default=0., type=float, help='Regularization on the fusion weight')
-
+        train.add_argument('--momentum_loss_weight',default=0.,type=float,help='Regularization on momentum loss')
+        train.add_argument('--energy_loss_weight',default=0.,type=float,help='useful for regularizing the energy loss')
         shuffle_train = train.add_mutually_exclusive_group()
         shuffle_train.add_argument('--shuffle_train', dest='shuffle_train', action='store_true', help='Shuffle training data')
         shuffle_train.add_argument('--no_shuffle_train', dest='shuffle_train', action='store_false', help='Don\'t shuffle training data')
