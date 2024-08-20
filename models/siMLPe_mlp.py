@@ -35,7 +35,7 @@ class LN_v2(nn.Module):
         return y
 
 class Spatial_FC(nn.Module):
-    def __init__(self,dim):
+    def __init__(self,dim): 
         super(Spatial_FC,self).__init__()
         self.fc=nn.Linear(dim,dim)
         self.arr0=Rearrange('b n d -> b d n')
@@ -83,7 +83,7 @@ class MLPblock(nn.Module):
 
         nn.init.constant_(self.fc0.fc.bias,0)
     
-    def forwrd(self,x):
+    def forward(self,x):
         x_=self.fc0(x)
         x_=self.norm0(x_)
         x=x+x_
@@ -109,7 +109,7 @@ def build_mlps(args):
         dim=args.hidden_dim,
         seq=seq_len,
         use_norm=args.with_normalization,
-        use_spatial_fc=args.spatial_fconly, 
+        use_spatial_fc=args.spatial_fc_only, 
         num_layers=args.num_layers,
         layernorm_axis=args.norm_axis
     )
